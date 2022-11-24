@@ -400,10 +400,10 @@ public class NoteEditor extends Activity {
         case R.id.menu_revert:
             cancelNote();
             break;
-            //换背景颜色选项
-//        case R.id.menu_color:
-//             changeColor();
-//             break;
+          //  换背景颜色选项
+        case R.id.menu_color:
+             changeColor();
+             break;
             //导出笔记选项
 //        case R.id.menu_output:
 //            outputNote();
@@ -525,12 +525,12 @@ public class NoteEditor extends Activity {
             );
     }
 
-//    public final void underLine(){
-//        //找到所在的column
-//        //改变其背景颜色
-//        //mText.setBackgroundColor(Color.RED);
-//
-//    }
+    public final void underLine(){
+        //找到所在的column
+        //改变其背景颜色
+        mText.setBackgroundColor(Color.RED);
+
+    }
     /**
      * This helper method cancels the work done on a note.  It deletes the note if it was
      * newly created, or reverts to the original text of the note i
@@ -571,7 +571,7 @@ public class NoteEditor extends Activity {
         NoteEditor.this.startActivity(intent);
     }
 
-    //跳转改变颜色的activity，将uri信息传到新的activity
+   // 跳转改变颜色的activity，将uri信息传到新的activity
     private final void changeColor() {
         Intent intent = new Intent(null,mUri);
         intent.setClass(NoteEditor.this,NoteColor.class);

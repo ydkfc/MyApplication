@@ -41,6 +41,8 @@ public final class NotePad {
      */
     public static final class Notes implements BaseColumns {
 
+
+
         // This class cannot be instantiated
         private Notes() {}
 
@@ -161,10 +163,11 @@ public final class NotePad {
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
+
         public static final String FLAG="0";
         public  SimpleDateFormat formatter  =  new SimpleDateFormat ("yyyy年MM月dd日 HH:mm:ss");
         public  Date curDate = new Date(System.currentTimeMillis());//获取当前时间
         public  String datetime = formatter.format(curDate);
-
+        public static final String COLUMN_NAME_BACK_COLOR = "color";
     }
 }

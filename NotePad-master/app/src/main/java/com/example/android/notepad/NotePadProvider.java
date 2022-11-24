@@ -170,138 +170,138 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
         // Maps "NAME" to "title AS NAME"
         sLiveFolderProjectionMap.put(LiveFolders.NAME, NotePad.Notes.COLUMN_NAME_TITLE + " AS " +
-            LiveFolders.NAME);
+                LiveFolders.NAME);
     }
 
     /**
-    *
-    * This class helps open, create, and upgrade the database file. Set to package visibility
-    * for testing purposes.
-    */
-   static class DatabaseHelper extends SQLiteOpenHelper {
+     *
+     * This class helps open, create, and upgrade the database file. Set to package visibility
+     * for testing purposes.
+     */
+    static class DatabaseHelper extends SQLiteOpenHelper {
 
-       DatabaseHelper(Context context) {
+        DatabaseHelper(Context context) {
 
-           // calls the super constructor, requesting the default cursor factory.
-           super(context, DATABASE_NAME, null, DATABASE_VERSION);
-       }
+            // calls the super constructor, requesting the default cursor factory.
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
 
-       /**
-        *
-        * Creates the underlying database with table name and column names taken from the
-        * NotePad class.
-        */
-       @Override
-       public void onCreate(SQLiteDatabase db) {
-           db.execSQL("CREATE TABLE " + NotePad.Notes.TABLE_NAME + " ("
-                   + NotePad.Notes._ID + " INTEGER PRIMARY KEY,"
-                   + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
-                   + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
-                   + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE +  " INTEGER"
-                   + ");");//创建数据库
-       }
-       @Override
-       public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        /**
+         *
+         * Creates the underlying database with table name and column names taken from the
+         * NotePad class.
+         */
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + NotePad.Notes.TABLE_NAME + " ("
+                    + NotePad.Notes._ID + " INTEGER PRIMARY KEY,"
+                    + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
+                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
+                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
+                    + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE +  " INTEGER"
+                    + ");");//创建数据库
+        }
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-           // Logs that the database is being upgraded
-           Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                   + newVersion + ", which will destroy all old data");
+            // Logs that the database is being upgraded
+            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+                    + newVersion + ", which will destroy all old data");
 
-           // Kills the table and existing data
-           db.execSQL("DROP TABLE IF EXISTS notes");
+            // Kills the table and existing data
+            db.execSQL("DROP TABLE IF EXISTS notes");
 
-           // Recreates the database with a new version
-           onCreate(db);
-       }
-   }
+            // Recreates the database with a new version
+            onCreate(db);
+        }
+    }
 
-   @Override
-   public boolean onCreate() {
-       mOpenHelper = new DatabaseHelper(getContext());
-       return true;
-   }
+    @Override
+    public boolean onCreate() {
+        mOpenHelper = new DatabaseHelper(getContext());
+        return true;
+    }
 
-   @Override
-   public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-           String sortOrder) {
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
 
-       // Constructs a new query builder and sets its table name
-       SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-       qb.setTables(NotePad.Notes.TABLE_NAME);
+        // Constructs a new query builder and sets its table name
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(NotePad.Notes.TABLE_NAME);
 
-       switch (sUriMatcher.match(uri)) {
-           // If the incoming URI is for notes, chooses the Notes projection
-           case NOTES:
-               qb.setProjectionMap(sNotesProjectionMap);
-               break;
-           case NOTE_ID:
-               qb.setProjectionMap(sNotesProjectionMap);
-               qb.appendWhere(
-                   NotePad.Notes._ID +    // the name of the ID column
-                   "=" +
-                   uri.getPathSegments().get(NotePad.Notes.NOTE_ID_PATH_POSITION));
-               break;
+        switch (sUriMatcher.match(uri)) {
+            // If the incoming URI is for notes, chooses the Notes projection
+            case NOTES:
+                qb.setProjectionMap(sNotesProjectionMap);
+                break;
+            case NOTE_ID:
+                qb.setProjectionMap(sNotesProjectionMap);
+                qb.appendWhere(
+                        NotePad.Notes._ID +    // the name of the ID column
+                                "=" +
+                                uri.getPathSegments().get(NotePad.Notes.NOTE_ID_PATH_POSITION));
+                break;
 
-           case LIVE_FOLDER_NOTES:
-               // If the incoming URI is from a live folder, chooses the live folder projection.
-               qb.setProjectionMap(sLiveFolderProjectionMap);
-               break;
+            case LIVE_FOLDER_NOTES:
+                // If the incoming URI is from a live folder, chooses the live folder projection.
+                qb.setProjectionMap(sLiveFolderProjectionMap);
+                break;
 
-           default:
-               // If the URI doesn't match any of the known patterns, throw an exception.
-               throw new IllegalArgumentException("Unknown URI " + uri);
-       }
+            default:
+                // If the URI doesn't match any of the known patterns, throw an exception.
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
 
 
-       String orderBy;
-       // If no sort order is specified, uses the default
-       if (TextUtils.isEmpty(sortOrder)) {
-           orderBy = NotePad.Notes.DEFAULT_SORT_ORDER;
-       } else {
-           // otherwise, uses the incoming sort order
-           orderBy = sortOrder;
-       }
+        String orderBy;
+        // If no sort order is specified, uses the default
+        if (TextUtils.isEmpty(sortOrder)) {
+            orderBy = NotePad.Notes.DEFAULT_SORT_ORDER;
+        } else {
+            // otherwise, uses the incoming sort order
+            orderBy = sortOrder;
+        }
 
-       // Opens the database object in "read" mode, since no writes need to be done.
-       SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        // Opens the database object in "read" mode, since no writes need to be done.
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 
-       Cursor c = qb.query(
-           db,            // The database to query
-           projection,    // The columns to return from the query
-           selection,     // The columns for the where clause
-           selectionArgs, // The values for the where clause
-           null,          // don't group the rows
-           null,          // don't filter by row groups
-           orderBy        // The sort order
-       );
+        Cursor c = qb.query(
+                db,            // The database to query
+                projection,    // The columns to return from the query
+                selection,     // The columns for the where clause
+                selectionArgs, // The values for the where clause
+                null,          // don't group the rows
+                null,          // don't filter by row groups
+                orderBy        // The sort order
+        );
 
-       // Tells the Cursor what URI to watch, so it knows when its source data changes
-       c.setNotificationUri(getContext().getContentResolver(), uri);
-       return c;
-   }
+        // Tells the Cursor what URI to watch, so it knows when its source data changes
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
+    }
 
-   @Override
-   public String getType(Uri uri) {
+    @Override
+    public String getType(Uri uri) {
 
-       /**
-        * Chooses the MIME type based on the incoming URI pattern
-        */
-       switch (sUriMatcher.match(uri)) {
+        /**
+         * Chooses the MIME type based on the incoming URI pattern
+         */
+        switch (sUriMatcher.match(uri)) {
 
-           // If the pattern is for notes or live folders, returns the general content type.
-           case NOTES:
-           case LIVE_FOLDER_NOTES:
-               return NotePad.Notes.CONTENT_TYPE;
+            // If the pattern is for notes or live folders, returns the general content type.
+            case NOTES:
+            case LIVE_FOLDER_NOTES:
+                return NotePad.Notes.CONTENT_TYPE;
 
-           // If the pattern is for note IDs, returns the note ID content type.
-           case NOTE_ID:
-               return NotePad.Notes.CONTENT_ITEM_TYPE;
+            // If the pattern is for note IDs, returns the note ID content type.
+            case NOTE_ID:
+                return NotePad.Notes.CONTENT_ITEM_TYPE;
 
-           // If the URI pattern doesn't match any permitted patterns, throws an exception.
-           default:
-               throw new IllegalArgumentException("Unknown URI " + uri);
-       }
+            // If the URI pattern doesn't match any permitted patterns, throws an exception.
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
     }
     static ClipDescription NOTE_STREAM_TYPES = new ClipDescription(null,
             new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN });
@@ -323,10 +323,10 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
             case NOTE_ID:
                 return NOTE_STREAM_TYPES.filterMimeTypes(mimeTypeFilter);
 
-                // If the URI pattern doesn't match any permitted patterns, throws an exception.
+            // If the URI pattern doesn't match any permitted patterns, throws an exception.
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
-            }
+        }
     }
 
     @Override
@@ -344,11 +344,11 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
             Cursor c = query(
                     uri,                    // The URI of a note
                     READ_NOTE_PROJECTION,   // Gets a projection containing the note's ID, title,
-                                            // and contents
+                    // and contents
                     null,                   // No WHERE clause, get all matching records
                     null,                   // Since there is no WHERE clause, no selection criteria
                     null                    // Use the default sort order (modification date,
-                                            // descending
+                    // descending
             );
 
 
@@ -376,7 +376,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
     @Override
     public void writeDataToPipe(ParcelFileDescriptor output, Uri uri, String mimeType,
-            Bundle opts, Cursor c) {
+                                Bundle opts, Cursor c) {
         FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
         PrintWriter pw = null;
         try {
@@ -453,11 +453,11 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
         // Performs the insert and returns the ID of the new note.
         long rowId = db.insert(
-            NotePad.Notes.TABLE_NAME,        // The table to insert into.
-            NotePad.Notes.COLUMN_NAME_NOTE,  // A hack, SQLite sets this column value to null
-                                             // if values is empty.
-            values                           // A map of column names, and the values to insert
-                                             // into the columns.
+                NotePad.Notes.TABLE_NAME,        // The table to insert into.
+                NotePad.Notes.COLUMN_NAME_NOTE,  // A hack, SQLite sets this column value to null
+                // if values is empty.
+                values                           // A map of column names, and the values to insert
+                // into the columns.
         );
 
         // If the insert succeeded, the row ID exists.
@@ -490,15 +490,15 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
             // based on the incoming "where" columns and arguments.
             case NOTES:
                 count = db.delete(
-                    NotePad.Notes.TABLE_NAME,  // The database table name
-                    where,                     // The incoming where clause column names
-                    whereArgs                  // The incoming where clause values
+                        NotePad.Notes.TABLE_NAME,  // The database table name
+                        where,                     // The incoming where clause column names
+                        whereArgs                  // The incoming where clause values
                 );
                 break;
 
-                // If the incoming URI matches a single note ID, does the delete based on the
-                // incoming data, but modifies the where clause to restrict it to the
-                // particular note ID.
+            // If the incoming URI matches a single note ID, does the delete based on the
+            // incoming data, but modifies the where clause to restrict it to the
+            // particular note ID.
             case NOTE_ID:
                 /*
                  * Starts a final WHERE clause by restricting it to the
@@ -506,9 +506,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                  */
                 finalWhere =
                         NotePad.Notes._ID +                              // The ID column name
-                        " = " +                                          // test for equality
-                        uri.getPathSegments().                           // the incoming note ID
-                            get(NotePad.Notes.NOTE_ID_PATH_POSITION)
+                                " = " +                                          // test for equality
+                                uri.getPathSegments().                           // the incoming note ID
+                                        get(NotePad.Notes.NOTE_ID_PATH_POSITION)
                 ;
 
                 // If there were additional selection criteria, append them to the final
@@ -519,9 +519,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
                 // Performs the delete.
                 count = db.delete(
-                    NotePad.Notes.TABLE_NAME,  // The database table name.
-                    finalWhere,                // The final WHERE clause
-                    whereArgs                  // The incoming where clause values.
+                        NotePad.Notes.TABLE_NAME,  // The database table name.
+                        finalWhere,                // The final WHERE clause
+                        whereArgs                  // The incoming where clause values.
                 );
                 break;
 
@@ -557,10 +557,10 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
                 // Does the update and returns the number of rows updated.
                 count = db.update(
-                    NotePad.Notes.TABLE_NAME, // The database table name.
-                    values,                   // A map of column names and new values to use.
-                    where,                    // The where clause column names.
-                    whereArgs                 // The where clause column values to select on.
+                        NotePad.Notes.TABLE_NAME, // The database table name.
+                        values,                   // A map of column names and new values to use.
+                        where,                    // The where clause column names.
+                        whereArgs                 // The where clause column values to select on.
                 );
                 break;
 
@@ -576,9 +576,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                  */
                 finalWhere =
                         NotePad.Notes._ID +                              // The ID column name
-                        " = " +                                          // test for equality
-                        uri.getPathSegments().                           // the incoming note ID
-                            get(NotePad.Notes.NOTE_ID_PATH_POSITION)
+                                " = " +                                          // test for equality
+                                uri.getPathSegments().                           // the incoming note ID
+                                        get(NotePad.Notes.NOTE_ID_PATH_POSITION)
                 ;
 
                 // If there were additional selection criteria, append them to the final WHERE
@@ -590,12 +590,12 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
                 // Does the update and returns the number of rows updated.
                 count = db.update(
-                    NotePad.Notes.TABLE_NAME, // The database table name.
-                    values,                   // A map of column names and new values to use.
-                    finalWhere,               // The final WHERE clause to use
-                                              // placeholders for whereArgs
-                    whereArgs                 // The where clause column values to select on, or
-                                              // null if the values are in the where argument.
+                        NotePad.Notes.TABLE_NAME, // The database table name.
+                        values,                   // A map of column names and new values to use.
+                        finalWhere,               // The final WHERE clause to use
+                        // placeholders for whereArgs
+                        whereArgs                 // The where clause column values to select on, or
+                        // null if the values are in the where argument.
                 );
                 break;
             // If the incoming pattern is invalid, throws an exception.

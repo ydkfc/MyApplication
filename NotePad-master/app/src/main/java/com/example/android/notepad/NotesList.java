@@ -54,7 +54,7 @@ public class NotesList extends ListActivity {
             NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
             //NotePad.Notes.FLAG,
             NotePad.Notes.COLUMN_NAME_NOTE,//添加笔记
-//            NotePad.Notes.COLUMN_NAME_BACK_COLOR,
+           NotePad.Notes.COLUMN_NAME_BACK_COLOR,
 };
 
     private static final int COLUMN_INDEX_TITLE = 1;
@@ -94,16 +94,11 @@ public class NotesList extends ListActivity {
         //加入正文
       int[] viewIDs = { android.R.id.text1, R.id.text3,android.R.id.text2, };//加入正文
 
-        SimpleCursorAdapter adapter
-                = new SimpleCursorAdapter(
-                this,                             // The Context for the ListView
-                R.layout.noteslist_item,          // Points to the XML for a list item
-                cursor,                           // The cursor to get items from
-                dataColumns,
-                viewIDs
-        );
+
+        //Modify to a custom adapter that can be filled with color. The custom code is in MyCursorAdapter.java
+
         //修改为可以填充颜色的自定义的adapter，自定义的代码在MyCursorAdapter.java中
-        adapter = new MyCursorAdapter(
+        MyCursorAdapter adapter = new MyCursorAdapter(
                 this,
                 R.layout.noteslist_item,
                 cursor,

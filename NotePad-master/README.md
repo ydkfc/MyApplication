@@ -4,7 +4,7 @@ This is an AndroidStudio rebuild of google SDK sample NotePad
 ##NoteList界面中笔记条目增加时间戳显示##
 ![image](./app/src/main/res/image/1.png)
 ###部分实现代码###
-...
+```agsl
 1
 private static final String[] PROJECTION = new String[] {
 NotePad.Notes._ID, 
@@ -75,12 +75,13 @@ android:singleLine="true"/>
 4
 String[] dataColumns = { NotePad.Notes.COLUMN_NAME_TITLE , NotePad.Notes.COLUMN_NAME_NOTE,NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE} ;
 int[] viewIDs = { android.R.id.text1, R.id.text3,android.R.id.text2, };
-...
+```
+
 ##添加笔记查询功能（根据标题）##
 ![image](./app/src/main/res/image/2.png)
 ###部分实现代码###
 
-...
+```agsl
 1
 private static final String[] PROJECTION = new String[] {
 NotePad.Notes._ID,
@@ -110,11 +111,12 @@ viewIDs
 setListAdapter(adapter);
 return true;
 }
-...
+```
+
 ##UI美化##
 ![image](./app/src/main/res/image/1.png)
 ###部分实现代码###
-...
+```agsl
 <TextView
 android:id="@android:id/text1"
 android:layout_width="match_parent"
@@ -145,12 +147,13 @@ android:background="@color/yellow"
 android:textAppearance="?android:attr/textAppearanceLarge"
 android:textColor="@color/white"
 android:singleLine="true"/>
-...
+```
+
 
 ##正文缩略显示##
 ![image](./app/src/main/res/image/1.png)
 ###部分实现代码###
-...
+```agsl
 1
 <TextView
 android:id="@+id/text3"
@@ -166,5 +169,6 @@ android:textSize="20dp" />
 2
 String[] dataColumns = { NotePad.Notes.COLUMN_NAME_TITLE , NotePad.Notes.COLUMN_NAME_NOTE,NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE} ;
 int[] viewIDs = { android.R.id.text1, R.id.text3,android.R.id.text2, };
-...
+```
+
 

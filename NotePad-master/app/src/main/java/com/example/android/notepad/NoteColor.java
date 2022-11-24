@@ -18,7 +18,7 @@ public class NoteColor extends Activity {
 
     private static final String[] PROJECTION = new String[] {
             NotePad.Notes._ID, // 0
-        //    NotePad.Notes.COLUMN_NAME_BACK_COLOR,
+            NotePad.Notes.COLUMN_NAME_BACK_COLOR,
     };
 
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class NoteColor extends Activity {
     protected void onPause() {
         super.onPause();
         ContentValues values = new ContentValues();
-   //     values.put(NotePad.Notes.COLUMN_NAME_BACK_COLOR, color);
+        values.put(NotePad.Notes.COLUMN_NAME_BACK_COLOR, color);
         getContentResolver().update(mUri, values, null, null);
 
     }
